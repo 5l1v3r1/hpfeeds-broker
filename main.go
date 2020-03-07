@@ -19,7 +19,7 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "output lots of stuff")
 	flag.Parse()
 
-	c := CreateClient()
+	c := createClient()
 	b := &hpfeeds.Broker{
 		Name: "mhn",
 		Port: 10000,
@@ -38,11 +38,11 @@ func main() {
 	}
 }
 
-type MongoClient struct {
+type mongoClient struct {
 	*mongo.Client
 }
 
-func CreateClient() *MongoClient {
+func createClient() *mongoClient {
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
@@ -60,10 +60,11 @@ func CreateClient() *MongoClient {
 		log.Fatal(err)
 	}
 
-	return &MongoClient{client}
+	return &mongoClient{client}
 }
 
-func (c *MongoClient) Identify(ident string) (*hpfeeds.Identity, error) {
+// Identify implements the hpfeeds.Identifier interface.
+func (c *mongoClient) Identify(ident string) (*hpfeeds.Identity, error) {
 	// Hardcoded for MHN installs
 	collection := c.Database("hpfeeds").Collection("auth_key")
 
